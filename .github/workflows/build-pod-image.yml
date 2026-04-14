@@ -7,6 +7,7 @@ on:
       - Dockerfile.pod
       - pod_server.py
       - start.sh
+  workflow_dispatch:
 
 jobs:
   build:
