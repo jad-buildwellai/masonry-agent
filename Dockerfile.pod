@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# Link package to public repo → ghcr.io makes it public automatically
+LABEL org.opencontainers.image.source=https://github.com/jad-buildwellai/masonry-agent
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # System deps: Python, SSH, git-lfs, CV libs
