@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+myenv/
+.venv/
+venv/
+
+# Training artifacts
+runs/
+masonry.v1i.yolo26/
+
+# Test outputs
+test_results/
+
+# Base pretrained models (not ours)
+yolov8l.pt
+yolo26l.pt
+
+# DS_Store
+.DS_Store
