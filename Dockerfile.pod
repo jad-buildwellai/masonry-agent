@@ -1,0 +1,44 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# System deps: Python, SSH, git-lfs, CV libs
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip python3-dev \
+    openssh-server \
+    git git-lfs \
+    ffmpeg build-essential \
+    libsndfile1 libglib2.0-0 libsm6 libxrender1 libxext6 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Configure sshd: allow root login + password auth
+RUN mkdir /var/run/sshd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# PyTorch with CUDA 12.1
+RUN pip3 install --no-cache-dir numpy==1.26.4
+RUN pip3 install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install --no-cache-dir \
+    fastapi uvicorn \
+    ultralytics \
+    opencv-python-headless
+
+WORKDIR /app
+
+# Copy server code + startup script
+COPY pod_server.py /app/pod_server.py
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Clone repo for LFS model pull on first boot
+# (model itself pulled in start.sh to avoid slow build)
+RUN git lfs install
+
+EXPOSE 22 8000
+
+CMD ["/start.sh"]
