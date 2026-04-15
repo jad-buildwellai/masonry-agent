@@ -22,9 +22,11 @@ fi
 # ── Model: use volume cache, pull from LFS on first boot ────────────────────
 mkdir -p /runpod-volume/models
 if [ ! -f /runpod-volume/models/masonry.pt ]; then
-  echo "[start.sh] First boot — pulling masonry.pt from git LFS..."
-  cd /app && git lfs pull --include="masonry.pt"
-  cp /app/masonry.pt /runpod-volume/models/masonry.pt
+  echo "[start.sh] First boot — cloning repo and pulling masonry.pt from git LFS..."
+  GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/jad-buildwellai/masonry-agent.git /tmp/masonry-repo
+  cd /tmp/masonry-repo && git lfs pull --include="masonry.pt"
+  cp /tmp/masonry-repo/masonry.pt /runpod-volume/models/masonry.pt
+  rm -rf /tmp/masonry-repo
   echo "[start.sh] Model cached to /runpod-volume/models/masonry.pt"
 else
   echo "[start.sh] Model found in volume cache."
